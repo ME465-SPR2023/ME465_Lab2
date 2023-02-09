@@ -28,12 +28,17 @@ def generate_launch_description():
         DeclareLaunchArgument(
             name="record-bag",
             default_value="false",
-            description="Filename to save data to",
+            description="Save sensor data to bag file",
         ),
         DeclareLaunchArgument(
             name="play-bag",
             default_value="false",
-            description="Filename to read data from",
+            description="Use sensor data from bag file",
+        ),
+        DeclareLaunchArgument(
+            name="save-mat",
+            default_value="false",
+            description="Save PDF to a .mat file"
         ),
         SetParameter(
             name="use_sim_time",
@@ -103,5 +108,10 @@ def generate_launch_description():
             remappings=[
                 ("/camera_info", "/camera2/camera_info"),
             ],
+        ),
+        Node(
+            condition=IfCondition(LaunchConfiguration("save-mat")),
+            package="ME465_Lab2",
+            executable="save_data_node",
         ),
     ])
