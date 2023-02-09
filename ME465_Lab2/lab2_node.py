@@ -63,6 +63,15 @@ class Lab2(Node):
     def detected_callback(self, msg):
         self.detected = msg.data
         
+    def gaussian(self, x, mean, std):
+        return np.exp(-(x - mean)**2 / (2 * std**2)) / (std * np.sqrt(2 * np.pi))
+        
+    def detected_pdf(self):
+        pdf = np.zeros_like(self.pdf)
+        for loc in self.map:
+            pdf += self.gaussian(self.x, loc, 0.2)
+        return pdf / pdf.sum()
+        
     def publish_pdf(self):
         """Publishes current probability density function for plotting."""
         msg = Float32MultiArray()
@@ -70,6 +79,14 @@ class Lab2(Node):
         self.pdf_publisher.publish(msg)
         
     def timer_callback(self):
+        msg = Twist()
+        msg.linear.x = 0.2
+        self.vel_publisher.publish(msg)
+        dx = self.vel * self.dt
+        self.pdf = np.convolve(self.gaussian(self.x, 2 * dx, 0.02), self.pdf, mode="same")
+        if self.detected:
+            self.pdf *= self.detected_pdf()
+        self.pdf /= self.pdf.sum()
         self.publish_pdf()
 
 
