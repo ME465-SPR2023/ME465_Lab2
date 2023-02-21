@@ -83,7 +83,7 @@ class Lab2(Node):
         msg.linear.x = 0.2
         self.vel_publisher.publish(msg)
         dx = self.vel * self.dt
-        self.pdf = np.convolve(self.gaussian(self.x, 2 * dx, 0.02), self.pdf, mode="same")
+        self.pdf = np.convolve(self.gaussian(self.x, dx, 0.02), self.pdf, mode="same")
         if self.detected:
             self.pdf *= self.detected_pdf()
         self.pdf /= self.pdf.sum()
